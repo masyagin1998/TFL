@@ -10,8 +10,8 @@ int how_to_use(const char* prog_name);
 
 int main(int argc, char *argv[])
 {
-    long n;
-    long i, j;
+    int n;
+    int i, j;
     
     if (argc != 2) {
         return how_to_use(argv[0]);
@@ -24,7 +24,7 @@ int main(int argc, char *argv[])
 
     for (i = 0; i < n; i++) {
         for (j = 0; j < n; j++) {
-            printf("%ld * %ld = %ld\n", i, j, (i * j) % n);
+            printf("%d * %d = %d\n", i, j, (i * j) % n);
         }
         printf("\n");
     }

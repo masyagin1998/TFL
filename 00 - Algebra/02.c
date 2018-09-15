@@ -9,13 +9,13 @@
 #define PREFIX_UNUSED(v) ((void)v)
 
 int how_to_use(const char* prog_name);
-void print_array(const long *arr, long n);
-bool arr_cmp(const long *arr, const long n, const long *arr1, const long n1);
+void print_array(const int *arr, int n);
+bool arr_cmp(const int *arr, const int n, const int *arr1, const int n1);
 
 int main(int argc, char *argv[])
 {
-    long n;
-    long *arr = NULL, *arr1 = NULL, *arr2 = NULL, *tmp = NULL;
+    int n;
+    int *arr = NULL, *arr1 = NULL, *arr2 = NULL, *tmp = NULL;
     int i, j;
     bool flag;
 
@@ -24,7 +24,7 @@ int main(int argc, char *argv[])
     }
 
     n = argc - 1;
-    arr = (long *) malloc(n * sizeof(long));
+    arr = (int *) malloc(n * sizeof(int));
     if (arr == NULL) {
         printf("unable to allocate memory for arr\n");
         return 1;
@@ -51,22 +51,23 @@ int main(int argc, char *argv[])
         }
     }
 
-    arr1 = (long *) malloc(n * sizeof(long));
+    arr1 = (int *) malloc(n * sizeof(int));
     if (arr1 == NULL) {
         printf("unable to allocate memory for arr1\n");
-        return 1;
-    }
-    arr2 = (long *) malloc(n * sizeof(long));
-    if (arr2 == NULL) {
-        printf("unable to allocate memory for arr2\n");
         return 1;
     }
     for (i = 0; i < n; i++) {
         arr1[i] = i + 1;
     }
-    memcpy(arr2, arr1, n * sizeof(long));
+    
+    arr2 = (int *) malloc(n * sizeof(int));
+    if (arr2 == NULL) {
+        printf("unable to allocate memory for arr2\n");
+        return 1;
+    }
+    memcpy(arr2, arr1, n * sizeof(int));
 
-    tmp = (long *) malloc(n * sizeof(long));
+    tmp = (int *) malloc(n * sizeof(int));
     if (tmp == NULL) {
         printf("unable to allocate memory for tmp\n");
         return 1;
@@ -77,7 +78,7 @@ int main(int argc, char *argv[])
         for (i = 0; i < n; i++) {
             tmp[i] = arr2[arr[i] - 1];
         }
-        memcpy(arr2, tmp, n * sizeof(long));
+        memcpy(arr2, tmp, n * sizeof(int));
         if (!arr_cmp(arr1, n, arr2, n)) {
             print_array(arr2, n);
         } else {
@@ -100,15 +101,15 @@ int how_to_use(const char* prog_name) {
     return 1;
 }
 
-void print_array(const long *arr, long n) {
+void print_array(const int *arr, int n) {
     int i;
     for (i = 0; i < n; i++) {
-        printf("%ld ", arr[i]);
+        printf("%d ", arr[i]);
     }
     printf("\n");
 }
 
-bool arr_cmp(const long *arr, const long n, const long *arr1, const long n1) {
+bool arr_cmp(const int *arr, const int n, const int *arr1, const int n1) {
     int i;
     if (n != n1) {
         return false;
