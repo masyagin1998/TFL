@@ -10,13 +10,7 @@
 
 int how_to_use(const char* prog_name);
 
-void print_array(const long *arr, long n) {
-    int i;
-    for (i = 0; i < n; i++) {
-        printf("%ld ", arr[i]);
-    }
-    printf("\n");
-}
+void print_array(const long *arr, long n);
 
 int main(int argc, char *argv[])
 {
@@ -98,8 +92,18 @@ int main(int argc, char *argv[])
     return 0;
 }
 
-int how_to_use(const char* prog_name) {
+int how_to_use(const char* prog_name)
+{
     printf("Usage: %s [number0]     [number1] ... [numberN]\n", prog_name);
     printf("Example: %s 4     5 1 4 2 3\n", prog_name);
     return 1;
+}
+
+void print_array(const long *arr, long n)
+{
+    int i;
+    for (i = 0; i < n; i++) {
+        printf("%ld ", arr[i]);
+    }
+    printf("\n");
 }

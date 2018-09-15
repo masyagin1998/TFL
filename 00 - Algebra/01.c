@@ -32,7 +32,8 @@ int main(int argc, char *argv[])
     return 0;
 }
 
-int how_to_use(const char* prog_name) {
+int how_to_use(const char* prog_name)
+{
     printf("Usage: %s [number]\n", prog_name);
     printf("Example: %s 5\n", prog_name);
     return 1;

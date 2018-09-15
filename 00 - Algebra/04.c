@@ -51,7 +51,8 @@ int main(int argc, char *argv[])
     return 0;
 }
 
-void check_associativity(int n, int arr[][n]) {
+void check_associativity(int n, int arr[][n])
+{
     int i, j, k;
     bool flag = true;
     
@@ -76,7 +77,8 @@ void check_associativity(int n, int arr[][n]) {
     }
 }
 
-void find_left_units(int n, int arr[][n]) {
+void find_left_units(int n, int arr[][n])
+{
     int i, j;
     bool flag;
 
@@ -93,7 +95,8 @@ void find_left_units(int n, int arr[][n]) {
     }
 }
 
-void find_right_units(int n, int arr[][n]) {
+void find_right_units(int n, int arr[][n])
+{
     int i, j;
     bool flag;
 
@@ -110,7 +113,8 @@ void find_right_units(int n, int arr[][n]) {
     }
 }
 
-void find_units(int n, int arr[][n]) {
+void find_units(int n, int arr[][n])
+{
     int i, j;
     bool flag;
 
@@ -127,7 +131,8 @@ void find_units(int n, int arr[][n]) {
     }
 }
 
-void find_generating_elements(int n, int arr[][n]) {
+void find_generating_elements(int n, int arr[][n])
+{
     int i, j;
     int tmp;
     bool arr1[n];
