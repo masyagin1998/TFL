@@ -188,7 +188,7 @@ void find_subgroups(int n, int arr[][n])
     }
 }
 
-bool next_combination (int n, int arr[], int k)
+bool next_combination(int n, int arr[], int k)
 {
     int i;
     
@@ -207,13 +207,31 @@ bool next_combination (int n, int arr[], int k)
 void check_subgroup(int n, int arr[][n], int k, int arr1[])
 {
     int i, j;
+    bool flag;
     
-    int arr2[n];
-    memset(arr2, 0, n * sizeof(int));
-
+    bool arr2[n];
+    for (i = 0; i < n; i++) arr2[i] = false;
+    for (i = 0; i < k; i++) arr2[arr1[i]] = true;
+    
     for (i = 0; i < k - 1; i++) {
         for (j = i + 1; j < k; j++)  {
-            
+            arr2[arr[j][i]] = true;
+            arr2[arr[i][j]] = true;
         }
+    }
+
+    flag = true;
+    for (i = 0; i < n; i++) {
+        if (!arr2[i]) {
+            flag = false;
+            break;
+        }
+    }
+
+    if (flag) {
+        for (i = 0; i < k; i++) {
+            printf("%s ", names[arr1[i]]);
+        }
+        printf("\n");
     }
 }
