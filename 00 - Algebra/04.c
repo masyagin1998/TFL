@@ -19,6 +19,7 @@ void find_left_units(int n, int arr[][n]);
 void find_right_units(int n, int arr[][n]);
 void find_units(int n, int arr[][n]);
 void find_generating_elements(int n, int arr[][n]);
+void find_subgroups(int n, int arr[][n]);
 
 int main(int argc, char *argv[])
 {
@@ -48,6 +49,9 @@ int main(int argc, char *argv[])
 
     printf("3.1) Generating elements:\n");
     find_generating_elements(n, arr);
+
+    printf("4.1) Subgroups:\n");
+    find_subgroups(n, arr);
     return 0;
 }
 
@@ -158,6 +162,58 @@ void find_generating_elements(int n, int arr[][n])
         }
         if (flag) {
             printf("      %s is generating element\n", names[i]);
+        }
+    }
+}
+
+bool next_combination (int n, int arr[], int k);
+
+void check_subgroup(int n, int arr[][n], int k, int arr1[]);
+
+void find_subgroups(int n, int arr[][n])
+{
+    int i, j;
+
+    int arr1[n];
+
+    for (i = 0; i < n; i++) {
+        for (j = 0; j < n; j++) {
+            arr1[j] = j + 1;
+        }
+        do {
+            for (j = 0; j < i + 1; j++) arr1[j]--;
+            check_subgroup(n, arr, i + 1, arr1);
+            for (j = 0; j < i + 1; j++) arr1[j]++;
+        } while(next_combination(n, arr1, i + 1));
+    }
+}
+
+bool next_combination (int n, int arr[], int k)
+{
+    int i;
+    
+	for (i = k - 1; i >= 0; --i) {
+		if (arr[i] < n - k + i + 1) {
+			++arr[i];
+			for (int j = i + 1; j < k; ++j) {
+				arr[j] = arr[j - 1] + 1;
+            }
+			return true;
+		}
+    }
+	return false;
+}
+
+void check_subgroup(int n, int arr[][n], int k, int arr1[])
+{
+    int i, j;
+    
+    int arr2[n];
+    memset(arr2, 0, n * sizeof(int));
+
+    for (i = 0; i < k - 1; i++) {
+        for (j = i + 1; j < k; j++)  {
+            
         }
     }
 }
