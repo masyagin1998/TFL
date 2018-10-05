@@ -206,29 +206,44 @@ bool next_combination(int n, int arr[], int k)
 
 void check_subgroup(int n, int arr[][n], int k, int arr1[])
 {
-    int i, j;
-    bool flag;
+    int i;
     
-    bool arr2[n];
-    for (i = 0; i < n; i++) arr2[i] = false;
-    for (i = 0; i < k; i++) arr2[arr1[i]] = true;
+    bool bools[n];
+    for (i = 0; i < n; i++) bools[i] = false;
+    for (i = 0; i < k; i++) bools[arr1[i]] = true;
+
+    int query[n];
+    int query_len = k;
+    for (i = 0; i < k; i++) query[i] = arr1[i];
     
-    for (i = 0; i < k - 1; i++) {
-        for (j = i + 1; j < k; j++)  {
-            arr2[arr[j][i]] = true;
-            arr2[arr[i][j]] = true;
+    int check[n];
+    int check_len = k;
+    for (i = 0; i < k; i++) check[i] = arr1[i];
+    while (query_len && (check_len != n)) {
+        int a = query[query_len - 1];
+        query_len--;
+        for (i = 0; i < check_len; i++) {
+            int b = check[i];
+            int c = arr[b][a];
+            if (!bools[c]) {
+                bools[c] = true;
+                query[query_len] = c;
+                query_len++;
+                check[check_len] = c;
+                check_len++;
+            }
+            c = arr[a][b];
+            if (!bools[c]) {
+                bools[c] = true;
+                query[query_len] = c;
+                query_len++;
+                check[check_len] = c;
+                check_len++;
+            }
         }
     }
 
-    flag = true;
-    for (i = 0; i < n; i++) {
-        if (!arr2[i]) {
-            flag = false;
-            break;
-        }
-    }
-
-    if (flag) {
+    if (check_len == n) {
         for (i = 0; i < k; i++) {
             printf("%s ", names[arr1[i]]);
         }
