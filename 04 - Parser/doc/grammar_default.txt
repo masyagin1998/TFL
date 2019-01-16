@@ -1,11 +1,7 @@
 program -> source_elements // Программа состоит из частей кода.
-
 source_elements -> empty | source_element_list // Части кода либо пустые (просто пустой файл), либо набор элементов кода.
-
 source_element_list -> source_element | source_element source_element_list // Набор элементов кода - от 1 до N элементов.
-
 source_element -> statement | function_declaration // 1 элемент - либо объявление функции, либо некоторое выражение.
-
 statement -> block                  // Блок {...}.
              | variable_statement   // Определение переменной.
              | empty_statement      // Пустое выражение.
@@ -21,7 +17,6 @@ statement -> block                  // Блок {...}.
              | throw_statement      // Бросание исключения.
              | try_statement        // TRY {...} CATCH {...}
              | debugger_statement   // Для дебага. Предлагает точки останова и тд.
-
 block -> LBRACE source_elements RBRACE // БЛОК.
 
 # ЛИТЕРАЛЫ.
@@ -31,13 +26,11 @@ literal -> null_literal      // Пустой литерал.
            | numeric_literal // Число.
            | string_literal  // Строка.
            | regex_literal   // Регулярка.
-
 boolean_literal -> TRUE | FALSE
 null_literal -> NULL
 numeric_literal -> NUMBER
 string_literal -> STRING
 regex_literal -> REGEX
-
 identifier -> ID // Название перменной.
 
 # ВЫРАЖЕНИЯ.
@@ -155,15 +148,12 @@ equality_expr -> relational_expr
 // БИТОВЫЕ ОПЕРАТОРЫ.
 
 bitwise_and_expr -> equality_expr | bitwise_and_expr BAND equality_expr // a & b - битовое И
-
 bitwise_xor_expr -> bitwise_and_expr | bitwise_xor_expr BXOR bitwise_and_expr // a ^ b - XOR
-
 bitwise_or_expr -> bitwise_xor_expr | bitwise_or_expr BOR bitwise_xor_expr // a | b - битовое ИЛИ
 
 // БИНАРНЫЕ ЛОГИЧЕСКИЕ ОПЕРАТОРЫ.
 
 logical_and_expr -> bitwise_or_expr | logical_and_expr AND bitwise_or_expr // a && b - логическое ИЛИ
-
 logical_or_expr -> logical_and_expr | logical_or_expr OR logical_and_exprp // a || b - логическое И
 
 // ТЕРНАРНЫЙ ОПЕРАТОР.
@@ -173,7 +163,6 @@ conditional_expr -> logical_or_expr | logical_or_expr CONDOP assignment_expr COL
 // ОПЕРАТОР ПРИСВАИВАНИЯ.
 
 assignment_expr -> conditional_expr | left_hand_side_expr assignment_operator assignment_expr
-
 assignment_operator -> EQ             // =
                        | MULTEQUAL    // *=
                        | DIVEQUAL     // /=
@@ -217,9 +206,7 @@ if_statement -> IF LPAREN expr RPAREN statement
 
 iteration_statement -> DO statement WHILE LPAREN expr RPAREN SEMI // DO ... WHILE (...);
                        | DO statement WHILE LPAREN expr RPAREN    // DO ... WHILE (...)
-
 iteration_statement -> WHILE LPAREN expr RPAREN statement // WHILE (...) ...
-
 iteration_statement -> FOR LPAREN expr_opt SEMI expr_opt SEMI expr_opt RPAREN statement
 
 expr_opt -> empty | expr
@@ -228,7 +215,7 @@ expr_opt -> empty | expr
 
 continue_statement -> CONTINUE SEMI | CONTINUE // CONTINUE
 
-continue_statement -> CONTINUE identifier SEMI  // CONTINUE НА МЕТКУ.
+continue_statement -> continue_statement : CONTINUE identifier SEMI
 
 // BREAK.
 
@@ -248,33 +235,9 @@ return_statement -> RETURN expr SEMI
 
 with_statement -> WITH LPAREN expr RPAREN statement // Возможность рассмотреть блок кода в контексте объекта.
 
-// SWITCH.
-
-switch_statement -> SWITCH LPAREN expr RPAREN case_block
-case_block -> LBRACE case_clauses_opt RBRACE
-              | LBRACE case_clauses_opt default_clause case_clauses_opt RBRACE
-case_clauses_opt -> empty
-                    | case_clauses
-case_clauses -> case_clause
-                | case_clauses case_clause
-case_clause -> CASE expr COLON source_elements
-default_clause -> DEFAULT COLON source_elements
-
 // МЕТКА.
 
 labelled_statement -> identifier COLON statement
-
-// THROW.
-
-throw_statement -> THROW expr SEMI
-
-// TRY-CATCH.
-
-try_statement -> TRY block catch
-                 | TRY block finally
-                 | TRY block catch finally
-catch -> CATCH LPAREN identifier RPAREN block
-finally -> FINALLY block
 
 // DEBUGGER.
 
@@ -284,8 +247,5 @@ debugger_statement -> DEBUGGER SEMI
 
 function_declaration -> FUNCTION identifier LPAREN RPAREN LBRACE function_body RBRACE                          // function fname () { ... }
                         | FUNCTION identifier LPAREN formal_parameter_list RPAREN LBRACE  function_body RBRACE // function fname (...) { ... }
-
-formal_parameter_list -> identifier
-                         | formal_parameter_list COMMA identifier
-
+formal_parameter_list -> identifier | formal_parameter_list COMMA identifier
 function_body -> source_elements

@@ -104,10 +104,7 @@ class Parser(object):
                      | break_statement
                      | return_statement
                      | with_statement
-                     | switch_statement
                      | labelled_statement
-                     | throw_statement
-                     | try_statement
                      | debugger_statement
         """
         p[0] = p[1]
@@ -630,83 +627,10 @@ class Parser(object):
         """with_statement : WITH LPAREN expr RPAREN statement"""
         p[0] = ast.With(expr=p[3], statement=p[5])
 
-    # 12.11 The switch Statement
-    def p_switch_statement(self, p):
-        """switch_statement : SWITCH LPAREN expr RPAREN case_block"""
-        cases = []
-        default = None
-        # iterate over return values from case_block
-        for item in p[5]:
-            if isinstance(item, ast.Default):
-                default = item
-            elif isinstance(item, list):
-                cases.extend(item)
-
-        p[0] = ast.Switch(expr=p[3], cases=cases, default=default)
-
-    def p_case_block(self, p):
-        """
-        case_block \
-            : LBRACE case_clauses_opt RBRACE
-            | LBRACE case_clauses_opt default_clause case_clauses_opt RBRACE
-        """
-        p[0] = p[2:-1]
-
-    def p_case_clauses_opt(self, p):
-        """case_clauses_opt : empty
-                            | case_clauses
-        """
-        p[0] = p[1]
-
-    def p_case_clauses(self, p):
-        """case_clauses : case_clause
-                        | case_clauses case_clause
-        """
-        if len(p) == 2:
-            p[0] = [p[1]]
-        else:
-            p[1].append(p[2])
-            p[0] = p[1]
-
-    def p_case_clause(self, p):
-        """case_clause : CASE expr COLON source_elements"""
-        p[0] = ast.Case(expr=p[2], elements=p[4])
-
-    def p_default_clause(self, p):
-        """default_clause : DEFAULT COLON source_elements"""
-        p[0] = ast.Default(elements=p[3])
-
     # 12.12 Labelled Statements
     def p_labelled_statement(self, p):
         """labelled_statement : identifier COLON statement"""
         p[0] = ast.Label(identifier=p[1], statement=p[3])
-
-    # 12.13 The throw Statement
-    def p_throw_statement(self, p):
-        """throw_statement : THROW expr SEMI
-        """
-        p[0] = ast.Throw(expr=p[2])
-
-    # 12.14 The try Statement
-    def p_try_statement_1(self, p):
-        """try_statement : TRY block catch"""
-        p[0] = ast.Try(statements=p[2], catch=p[3])
-
-    def p_try_statement_2(self, p):
-        """try_statement : TRY block finally"""
-        p[0] = ast.Try(statements=p[2], fin=p[3])
-
-    def p_try_statement_3(self, p):
-        """try_statement : TRY block catch finally"""
-        p[0] = ast.Try(statements=p[2], catch=p[3], fin=p[4])
-
-    def p_catch(self, p):
-        """catch : CATCH LPAREN identifier RPAREN block"""
-        p[0] = ast.Catch(identifier=p[3], elements=p[5])
-
-    def p_finally(self, p):
-        """finally : FINALLY block"""
-        p[0] = ast.Finally(elements=p[2])
 
     # 12.15 The debugger statement
     def p_debugger_statement(self, p):

@@ -7,6 +7,6 @@ b >>= 1; b <<= 1; b >>>= 1;
 b++; b--; +b; -b; !b; ~b;
 var c = 5 > 7 ? "heh" : 1; // Тернарный оператор.
 a = 1, b = 2, c = 3;
-alert(a)
-alert(b)
-alert(c)
+alert(a);
+alert(b);
+alert(c);
