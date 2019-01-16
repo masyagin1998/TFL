@@ -48,6 +48,14 @@ def visit(node, i):
             t += (', ' + child.value + ')')
             print(t)
             visit(child, i + 1)
+        elif isinstance(child, (
+            ast.BinOp,
+            ast.Assign,
+            ast.UnaryOp
+        )):
+            t += (', ' + child.op + ')')
+            print(t)
+            visit(child, i + 1)
         else:
             t += ')'
             print(t)

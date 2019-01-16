@@ -1,0 +1,291 @@
+program -> source_elements // Программа состоит из частей кода.
+
+source_elements -> empty | source_element_list // Части кода либо пустые (просто пустой файл), либо набор элементов кода.
+
+source_element_list -> source_element | source_element source_element_list // Набор элементов кода - от 1 до N элементов.
+
+source_element -> statement | function_declaration // 1 элемент - либо объявление функции, либо некоторое выражение.
+
+statement -> block                  // Блок {...}.
+             | variable_statement   // Определение переменной.
+             | empty_statement      // Пустое выражение.
+             | expr_statement       // Вычислимое выражение.
+             | if_statement         // IF.
+             | iteration_statement  // FOR/WHILE/DO-WHILE.
+             | continue_statement   // CONTINUE в цикле.
+             | break_statement      // BREAK в цикле.
+             | return_statement     // Возврат значения.
+             | with_statement       // WITH - рассмотреть block в контексте объекта (ныне устарел, но все еще используется).
+             | switch_statement     // SWITCH-CASE.
+             | labelled_statement   // Метка для break.
+             | throw_statement      // Бросание исключения.
+             | try_statement        // TRY {...} CATCH {...}
+             | debugger_statement   // Для дебага. Предлагает точки останова и тд.
+
+block -> LBRACE source_elements RBRACE // БЛОК.
+
+# ЛИТЕРАЛЫ.
+
+literal -> null_literal      // Пустой литерал.
+           | boolean_literal // Булева константа.
+           | numeric_literal // Число.
+           | string_literal  // Строка.
+           | regex_literal   // Регулярка.
+
+boolean_literal -> TRUE | FALSE
+null_literal -> NULL
+numeric_literal -> NUMBER
+string_literal -> STRING
+regex_literal -> REGEX
+
+identifier -> ID // Название перменной.
+
+# ВЫРАЖЕНИЯ.
+
+primary_expr -> primary_expr_no_brace | object_literal // Выражение без скобок или объект.
+
+primary_expr_no_brace -> identifier
+                         | THIS // Ключевое слово THIS.
+                         | literal // литерал.
+                         | array_literal // Массив.
+                         | LPAREN expr RPAREN // (...)
+
+array_literal -> LBRACKET elision_opt RBRACKET // []
+                 | LBRACKET element_list RBRACKET // [...]
+                 | LBRACKET element_list COMMA elision_opt RBRACKET // [...,]
+
+element_list -> elision_opt assignment_expr | element_list COMMA elision_opt assignment_expr
+elision_opt -> empty | elision
+elision -> COMMA | elision COMMA
+
+object_literal -> LBRACE RBRACE                       // {}
+                  | LBRACE property_list RBRACE       // {...}
+                  | LBRACE property_list COMMA RBRACE // {... ,}
+
+property_list -> property_assignment | property_list COMMA property_assignment
+property_assignment -> property_name COLON assignment_expr
+                       | GETPROP property_name LPAREN RPAREN LBRACE function_body RBRACE
+                       | SETPROP property_name LPAREN formal_parameter_list RPAREN LBRACE function_body RBRACE
+property_name -> identifier
+                 | string_literal
+                 | numeric_literal
+
+# ЛЕВОСТОРОННИЕ ПРИСВАИВАНИЯ.
+
+member_expr -> primary_expr
+               | member_expr LBRACKET expr RBRACKET
+               | member_expr PERIOD identifier
+               | NEW member_expr arguments
+
+new_expr -> member_expr
+            | NEW new_expr
+
+call_expr -> member_expr arguments
+             | call_expr arguments
+             | call_expr LBRACKET expr RBRACKET
+             | call_expr PERIOD identifier
+
+arguments -> LPAREN RPAREN
+             | LPAREN argument_list RPAREN
+argument_list -> assignment_expr
+                 | argument_list COMMA assignment_expr
+
+left_hand_side_expr -> new_expr
+                       | call_expr
+
+# ПОСТФИКСНЫЕ ВЫРАЖЕНИЯ.
+
+postfix_expr -> left_hand_side_expr
+                | left_hand_side_expr PLUSPLUS // expr++
+                | left_hand_side_expr MINUSMINUS // expr--
+
+# УНАРНЫЕ ОПЕРАТОРЫ.
+
+unary_expr -> postfix_expr        // Постфиксное выражение.
+              | unary_expr_common // Классические унарные выражения.
+
+unary_expr_common -> DELETE unary_expr       // Удаление свойства из объекта.
+                     | VOID unary_expr       // VOID вычисляет выражене и возвращает UNDEFINED.
+                     | TYPEOF unary_expr     // Возвращает тип данных.
+                     | PLUSPLUS unary_expr   // ++unary_expr
+                     | MINUSMINUS unary_expr // --unary_expr
+                     | PLUS unary_expr       // +unary_expr
+                     | MINUS unary_expr      // -unary_expr
+                     | BNOT unary_expr       // 
+                     | NOT unary_expr        //
+
+# МУЛЬТИПЛИКАТИВНЫЕ ОПЕРАТОРЫ.
+
+multiplicative_expr -> unary_expr                            // 
+                       | multiplicative_expr MULT unary_expr // a * b
+                       | multiplicative_expr DIV unary_expr  // a / b
+                       | multiplicative_expr MOD unary_expr  // a % b
+
+# АДДИТИВНЫЕ ОПЕРАТОРЫ.
+
+additive_expr -> multiplicative_expr
+                 | additive_expr PLUS multiplicative_expr  // a + b
+                 | additive_expr MINUS multiplicative_expr // a - b
+
+# ОПЕРАТОРЫ БИТОВОГО СДВИГА.
+
+shift_expr -> additive_expr
+              | shift_expr LSHIFT additive_expr // a << b  Сдвигает двоичное представление a на b битов влево, добавляя справа нули.
+              | shift_expr RSHIFT additive_expr // a >> b  Сдвигает двоичное представление a на b битов вправо, отбрасывая сдвигаемые биты.
+              | shift_expr URSHIFT additive_exp // a >>> b Сдвигает двоичное представление a на b битов вправо, отбрасывая сдвигаемые биты и добавляя нули слева.
+
+# ОПЕРАТОРЫ СРАВНЕНИЯ.
+
+relational_expr -> shift_expr
+                   | relational_expr LT shift_expr         // a < b
+                   | relational_expr GT shift_expr         // a > b
+                   | relational_expr LE shift_expr         // a <= b
+                   | relational_expr GE shift_expr         // a >= b
+                   | relational_expr INSTANCEOF shift_expr // Оператор instanceof позволяет проверить, какому классу принадлежит объект, с учетом прототипного наследования.
+                   | relational_expr IN shift_expr         // prop in object - проверка, есть ли свойство в объекте.
+
+# ОПЕРАТОРЫ ПРОВЕРКИ НА РАВЕНСТВО.
+
+equality_expr -> relational_expr
+                 | equality_expr EQEQ relational_expr   // a == b
+                 | equality_expr NE relational_expr     // a != b
+                 | equality_expr STREQ relational_expr  // a === b - проверка равенства без преобразования типов.
+                 | equality_expr STRNEQ relational_expr // a !== b - проверка неравенства без преобразования типов.
+
+// БИТОВЫЕ ОПЕРАТОРЫ.
+
+bitwise_and_expr -> equality_expr | bitwise_and_expr BAND equality_expr // a & b - битовое И
+
+bitwise_xor_expr -> bitwise_and_expr | bitwise_xor_expr BXOR bitwise_and_expr // a ^ b - XOR
+
+bitwise_or_expr -> bitwise_xor_expr | bitwise_or_expr BOR bitwise_xor_expr // a | b - битовое ИЛИ
+
+// БИНАРНЫЕ ЛОГИЧЕСКИЕ ОПЕРАТОРЫ.
+
+logical_and_expr -> bitwise_or_expr | logical_and_expr AND bitwise_or_expr // a && b - логическое ИЛИ
+
+logical_or_expr -> logical_and_expr | logical_or_expr OR logical_and_exprp // a || b - логическое И
+
+// ТЕРНАРНЫЙ ОПЕРАТОР.
+
+conditional_expr -> logical_or_expr | logical_or_expr CONDOP assignment_expr COLON assignment_expr // a ? b : c - тернарный оператор
+
+// ОПЕРАТОР ПРИСВАИВАНИЯ.
+
+assignment_expr -> conditional_expr | left_hand_side_expr assignment_operator assignment_expr
+
+assignment_operator -> EQ             // =
+                       | MULTEQUAL    // *=
+                       | DIVEQUAL     // /=
+                       | MODEQUAL     // %=
+                       | PLUSEQUAL    // +=
+                       | MINUSEQUAL   // -=
+                       | LSHIFTEQUAL  // <<=
+                       | RSHIFTEQUAL  // >>=
+                       | URSHIFTEQUAL // >>>=
+                       | ANDEQUAL     // &=
+                       | XOREQUAL     // ^=
+                       | OREQUAL      // |=
+
+// ОПЕРАТОР ЗАПЯТАЯ.
+
+expr -> assignment_expr | expr COMMA assignment_expr
+
+// СПИСОРК ОБЪЯВЛЕНИЯ ПЕРЕМЕННЫХ.
+
+variable_statement -> VAR variable_declaration_list SEMI | VAR variable_declaration_list
+variable_declaration_list -> variable_declaration | variable_declaration_list COMMA variable_declaration
+
+variable_declaration -> identifier | identifier initializer
+
+initializer -> EQ assignment_expr
+
+// ПУСТОЙ ОПЕРАТОР (В JS ПРИНЯТО ИСПОЛЬЗОВАТЬ `;` ОДНАКО В ЦЕЛОМ ЭТО НЕОБЯЗАТЕЛЬНО)
+
+empty_statement -> SEMI
+
+// ВЫРАЖЕНИЕ.
+
+expr_statement -> expr SEMI // "выражение;"
+
+// IF.
+
+if_statement -> IF LPAREN expr RPAREN statement
+                | IF LPAREN expr RPAREN statement ELSE statement
+
+// ЦИКЛЫ.
+
+iteration_statement -> DO statement WHILE LPAREN expr RPAREN SEMI // DO ... WHILE (...);
+                       | DO statement WHILE LPAREN expr RPAREN    // DO ... WHILE (...)
+
+iteration_statement -> WHILE LPAREN expr RPAREN statement // WHILE (...) ...
+
+iteration_statement -> FOR LPAREN expr_opt SEMI expr_opt SEMI expr_opt RPAREN statement
+
+expr_opt -> empty | expr
+
+// CONTINUE.
+
+continue_statement -> CONTINUE SEMI | CONTINUE // CONTINUE
+
+continue_statement -> CONTINUE identifier SEMI  // CONTINUE НА МЕТКУ.
+
+// BREAK.
+
+break_statement -> BREAK SEMI | BREAK // BREAK
+
+break_statement -> BREAK identifier SEMI // BREAK НА МЕТКУ.
+
+// RETURN.
+
+return_statement -> RETURN SEMI
+                    | RETURN
+
+return_statement -> RETURN expr SEMI
+                    | RETURN expr
+
+// WITH.
+
+with_statement -> WITH LPAREN expr RPAREN statement // Возможность рассмотреть блок кода в контексте объекта.
+
+// SWITCH.
+
+switch_statement -> SWITCH LPAREN expr RPAREN case_block
+case_block -> LBRACE case_clauses_opt RBRACE
+              | LBRACE case_clauses_opt default_clause case_clauses_opt RBRACE
+case_clauses_opt -> empty
+                    | case_clauses
+case_clauses -> case_clause
+                | case_clauses case_clause
+case_clause -> CASE expr COLON source_elements
+default_clause -> DEFAULT COLON source_elements
+
+// МЕТКА.
+
+labelled_statement -> identifier COLON statement
+
+// THROW.
+
+throw_statement -> THROW expr SEMI
+
+// TRY-CATCH.
+
+try_statement -> TRY block catch
+                 | TRY block finally
+                 | TRY block catch finally
+catch -> CATCH LPAREN identifier RPAREN block
+finally -> FINALLY block
+
+// DEBUGGER.
+
+debugger_statement -> DEBUGGER SEMI
+
+// ФУНКЦИЯ.
+
+function_declaration -> FUNCTION identifier LPAREN RPAREN LBRACE function_body RBRACE                          // function fname () { ... }
+                        | FUNCTION identifier LPAREN formal_parameter_list RPAREN LBRACE  function_body RBRACE // function fname (...) { ... }
+
+formal_parameter_list -> identifier
+                         | formal_parameter_list COMMA identifier
+
+function_body -> source_elements
